@@ -117,12 +117,11 @@ export default function Home() {
     amount,
   }));
 
-  console.log(categoryExpensesArray)
 
   return (
-    <Container className="flex flex-col gap-16 items-center p-20">
-      <div className="h-fit min-h-[500px] w-[calc(100vw-10rem)] grid grid-rows-2 grid-cols-3 max-lg:grid-cols-5 gap-8">
-        <div className="bg-gray-200 row-span-2 max-lg:col-span-3 flex flex-col">
+    <Container className="flex flex-col gap-24 items-center p-20">
+      <div className="h-fit min-h-[500px] w-[calc(100vw-10rem)] flex gap-8">
+        <div className="bg-gray-200 flex-[3] flex flex-col">
           <div className="flex flex-1 flex-col items-start justify-center gap-1 rounded-t-lg bg-dark-secondary px-4">
             <span className="text-gray">Balance</span>
             <h2
@@ -179,16 +178,7 @@ export default function Home() {
           </div>
         </div>
         <ResponsiveContainer
-          className={`col-span-2 ${transactions.length === 0 ? "hidden" : ""}`}
-        >
-          <BarChart width={730} height={250} data={monthlyExpenditure}>
-            <XAxis dataKey="monthName" />
-            <YAxis label={{ value: 'Expenses', angle: -90, position: 'insideLeft' }}  />
-            <Bar dataKey="amount" fill="#4199FF" />
-          </BarChart>
-        </ResponsiveContainer>
-        <ResponsiveContainer
-          className={`col-span-2 flex items-center justify-center self-center ${
+          className={`flex-[5] h-fit min-h-[400px] flex items-center justify-center self-center ${
             transactions.length === 0 ? "hidden" : ""
           }`}
         >
@@ -203,7 +193,7 @@ export default function Home() {
                 <Cell key={`cell-${index}`} fill={colors[index]} />
               ))}
             </Pie>
-            <Legend iconSize={20} iconType="square" />
+            <Legend iconSize={20} iconType="plainline" />
           </PieChart>
         </ResponsiveContainer>
         {transactions.length === 0 && (
@@ -212,6 +202,16 @@ export default function Home() {
           </span>
         )}
       </div>
+
+      <ResponsiveContainer
+          className={`min-h-[400px] w-[calc(100vw-10rem)] ${transactions.length === 0 ? "hidden" : ""}`}
+        >
+          <BarChart width={730} height={250} data={monthlyExpenditure}>
+            <XAxis dataKey="monthName" />
+            <YAxis label={{ value: 'Expenses', angle: -90, position: 'insideLeft' }}  />
+            <Bar dataKey="amount" fill="#4199FF" />
+          </BarChart>
+        </ResponsiveContainer>
 
       <div className="h-fit w-[calc(100vw-10rem)] flex flex-col items-start justify-start max-sm:items-center">
         <div
