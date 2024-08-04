@@ -29,6 +29,7 @@ export default function BudgetCard({ spent, total, categoryName }: BudgetCardPro
       value={percent}
       color={percent > 75 ? "danger" : percent > 50 ? "warning" : "success"}
       showValueLabel={true}
+      aria-label={`${categoryName} budget progress`}
     />
     <CardFooter className="flex items-center justify-center text-center text-gray">
       {spent.toLocaleString()}/{total.toLocaleString()} ₹ used

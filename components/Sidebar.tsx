@@ -19,7 +19,7 @@ export default function Sidebar({ currentPath }: { currentPath: string }) {
   return (
     <>
       <button
-        className={`cursor-pointer rounded-md fixed top-4 left-4 z-[5] p-3 flex items-center justify-center transition-colors focus:outline-2 outline-primary outline outline-0 outline-offset-2 ${
+        className={`cursor-pointer rounded-md fixed top-4 left-4 z-[5] p-3 flex items-center justify-center transition-colors focus:outline-2 outline-primary outline outline-0 outline-offset-2 border-2 border-dark ${
           isOpen ? "bg-dark" : "bg-dark-secondary"
         }`}
         onClick={() => setIsOpen((prev) => !prev)}
