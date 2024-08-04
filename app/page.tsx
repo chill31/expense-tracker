@@ -186,7 +186,7 @@ export default function Home() {
           </PieChart>
         </ResponsiveContainer>
         {transactions.length === 0 && (
-          <span className="col-span-2 row-span-2 h-full w-full flex items-center justify-center text-gray self-center text-2xl">
+          <span className="h-full w-full flex items-center justify-center text-gray self-center text-2xl max-md:mt-24">
             No Data To Visualize
           </span>
         )}
