@@ -3,7 +3,6 @@
 import { Image } from "@nextui-org/image";
 import { Link } from "@nextui-org/link";
 import NextLink from "next/link";
-import { Button } from "@nextui-org/button";
 import { useState } from "react";
 import { BsList } from "react-icons/bs";
 

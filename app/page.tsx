@@ -22,6 +22,7 @@ import { Divider } from "@nextui-org/divider";
 import BudgetCard from "@/components/BudgetCard";
 import CategoryIcon from "@/components/CategoryIcon";
 import { useEffect, useState } from "react";
+import NextLink from "next/link";
 
 const colors = [
   "#69BCC4", // Teal
@@ -106,7 +107,7 @@ export default function Home() {
   }
 
   return (
-    <Container className="flex flex-col gap-24 items-center p-20 max-[900px]:pt-20 max-[900px]:p-10">
+    <Container>
 
       <div className="h-fit min-h-[500px] w-[calc(100vw-10rem)] max-[900px]:w-[calc(100vw-5rem)] flex gap-8 max-md:flex-col">
 
@@ -124,7 +125,7 @@ export default function Home() {
           <div className="flex flex-[2] max-md:flex-[unset] flex-col items-start justify-start gap-1 rounded-b-lg bg-dark-secondary/50 p-4">
             <div className="flex items-center justify-between w-full mb-12">
               <span className="text-gray max-sm:text-sm">Recent Transactions</span>
-              <Link href="/transactions" className="max-sm:text-sm">See All</Link>
+              <Link href="/transactions" className="max-sm:text-sm" as={NextLink}>See All</Link>
             </div>
 
             {transactions.slice(0, 3).map((item, index) => (
@@ -143,7 +144,7 @@ export default function Home() {
                     <div className="flex flex-col items-start justify-start gap-1 w-[100%]">
                       <span className="text-lg max-sm:text-sm overflow-hidden whitespace-nowrap text-ellipsis w-[11ch]">{item.transactionName}</span>
                       <span className="text-white/50 text-sm max-sm:text-[.7rem]">
-                        {new Date(item.date.toISOString()).toDateString()}
+                        {new Date(item.date).toDateString()}
                       </span>
                     </div>
                   </div>
