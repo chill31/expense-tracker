@@ -10,6 +10,15 @@ export const metadata: Metadata = {
   title: "Expensz by Chill31",
   description:
     "Expense tracker web app created with the help of Next.js and Tailwind CSS.",
+    openGraph: {
+      title: 'Expensz by Chill31',
+      description: 'Expense tracker web app created with the help of Next.js and Tailwind CSS.',
+      url: 'https://expensz.vercel.app',
+      siteName: 'Expensz',
+      images: '/og-image.png',
+      locale: 'en_IN',
+      type: 'website',
+    },
 };
 
 export default function RootLayout({
@@ -20,9 +29,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body className={dm_sans.className}>
-        <Providers>
-          {children}
-        </Providers>
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

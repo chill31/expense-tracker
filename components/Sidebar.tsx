@@ -18,7 +18,7 @@ export default function Sidebar({ currentPath }: { currentPath: string }) {
   return (
     <>
       <button
-        className={`cursor-pointer rounded-md fixed top-4 left-4 z-[5] p-3 flex items-center justify-center transition-colors focus:outline-2 outline-primary outline outline-0 outline-offset-2 border-2 border-dark ${
+        className={`cursor-pointer rounded-md fixed top-4 left-4 z-[50] p-3 flex items-center justify-center transition-colors focus:outline-2 outline-primary outline outline-0 outline-offset-2 border-2 border-dark ${
           isOpen ? "bg-dark" : "bg-dark-secondary"
         }`}
         onClick={() => setIsOpen((prev) => !prev)}
@@ -27,14 +27,14 @@ export default function Sidebar({ currentPath }: { currentPath: string }) {
       </button>
 
       <div
-        className={`fixed top-0 left-0 z-[3] h-screen w-screen bg-black/50 transition-opacity ${
+        className={`fixed top-0 left-0 z-[30] h-screen w-screen bg-black/50 transition-opacity ${
           isOpen ? "scale-100 opacity-100" : "scale-0 opacity-0"
         }`}
         onClick={(e) => checkAndClose(e)}
       ></div>
 
       <div
-        className={`fixed top-0 left-0 z-[4] w-64 h-screen flex flex-col items-center justify-center gap-8 max-sm:gap-6 bg-dark-secondary transition-transform ${
+        className={`fixed top-0 left-0 z-[40] w-64 h-screen flex flex-col items-center justify-center gap-8 max-sm:gap-6 bg-dark-secondary transition-transform ${
           isOpen ? "translate-x-0" : "translate-x-[-100%]"
         }`}
       >

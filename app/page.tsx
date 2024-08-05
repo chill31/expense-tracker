@@ -30,13 +30,12 @@ const colors = [
   "#C6C1BA", // Gray
   "#7893B8", // Blue
   "#A46262", // Maroon
-  "#9EAD88", // Green
+  "#8F8CDF", // Green
   "#C89595", // Rose
   "#FF6F61", // Coral
 ];
 
 export default function Home() {
-
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [budgets, setBudgets] = useState<Budget[]>([]);
 
@@ -67,12 +66,12 @@ export default function Home() {
     expenses: 0,
     income: 0,
   }));
-  
+
   transactions.forEach((transaction) => {
     const date = new Date(transaction.date);
     const month = date.getMonth();
     const amount = transaction.amount;
-  
+
     if (transaction.category !== "income") {
       monthlyExpenditure[month].expenses += amount;
     } else {
@@ -80,38 +79,46 @@ export default function Home() {
     }
   });
 
-  const categoryExpenses: { [key: string]: number } = transactions.reduce((acc, curr) => {
-    if (curr.category !== "income") {
-      if (acc[curr.category]) {
-        acc[curr.category] += curr.amount;
-      } else {
-        acc[curr.category] = curr.amount;
+  const categoryExpenses: { [key: string]: number } = transactions.reduce(
+    (acc, curr) => {
+      if (curr.category !== "income") {
+        if (acc[curr.category]) {
+          acc[curr.category] += curr.amount;
+        } else {
+          acc[curr.category] = curr.amount;
+        }
       }
-    }
-    return acc;
-  }, {} as { [key: string]: number });
+      return acc;
+    },
+    {} as { [key: string]: number }
+  );
 
-  const categoryExpensesArray = Object.entries(categoryExpenses).map(([category, amount]) => ({
-    category,
-    amount,
-  }));
+  const categoryExpensesArray = Object.entries(categoryExpenses).map(
+    ([category, amount]) => ({
+      category,
+      amount,
+    })
+  );
 
   function formatNumber(num: number) {
     if (num >= 10000000) {
-      return (Math.floor(num / 1000000) / 10) + ' Cr';
+      return Math.floor(num / 1000000) / 10 + " Cr";
     } else if (num >= 100000) {
-      return (Math.floor(num / 10000) / 10) + ' L';
+      return Math.floor(num / 10000) / 10 + " L";
     } else {
       return num.toLocaleString();
     }
   }
 
+  // get the three newest transactions according to their date
+  const recentTransactions = transactions
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+    .slice(0, 3);
+
   return (
     <Container>
-
       <div className="h-fit min-h-[500px] w-[calc(100vw-10rem)] max-[900px]:w-[calc(100vw-5rem)] flex gap-8 max-md:flex-col">
-
-        <div className="bg-gray-200 flex-[3] max-md:flex-[unset] flex flex-col">
+        <div className="bg-gray-200 flex-[3] max-md:flex-[unset] flex flex-col shadow-large">
           <div className="flex flex-1 flex-col items-start justify-center gap-1 rounded-t-lg bg-dark-secondary px-4 max-md:p-6">
             <span className="text-gray">Balance</span>
             <h2
@@ -124,11 +131,19 @@ export default function Home() {
           </div>
           <div className="flex flex-[2] max-md:flex-[unset] flex-col items-start justify-start gap-1 rounded-b-lg bg-dark-secondary/50 p-4">
             <div className="flex items-center justify-between w-full mb-12">
-              <span className="text-gray max-sm:text-sm">Recent Transactions</span>
-              <Link href="/transactions" className="max-sm:text-sm" as={NextLink}>See All</Link>
+              <span className="text-gray max-sm:text-sm">
+                Recent Transactions
+              </span>
+              <Link
+                href="/transactions"
+                className="max-sm:text-sm"
+                as={NextLink}
+              >
+                See All
+              </Link>
             </div>
 
-            {transactions.slice(0, 3).map((item, index) => (
+            {recentTransactions.map((item, index) => (
               <>
                 <div
                   key={index}
@@ -142,7 +157,9 @@ export default function Home() {
                       />
                     </span>
                     <div className="flex flex-col items-start justify-start gap-1 w-[100%]">
-                      <span className="text-lg max-sm:text-sm overflow-hidden whitespace-nowrap text-ellipsis w-[11ch]">{item.transactionName}</span>
+                      <span className="text-lg max-sm:text-sm overflow-hidden whitespace-nowrap text-ellipsis w-[11ch]">
+                        {item.transactionName}
+                      </span>
                       <span className="text-white/50 text-sm max-sm:text-[.7rem]">
                         {new Date(item.date).toDateString()}
                       </span>
@@ -191,20 +208,21 @@ export default function Home() {
             No Data To Visualize
           </span>
         )}
-
       </div>
 
       <ResponsiveContainer
-          className={`min-h-[400px] max-md:min-h-[200px] w-[calc(100vw-10rem)] max-[900px]:w-[calc(100vw-5rem)] ${transactions.length === 0 ? "hidden" : ""}`}
-        >
-          <BarChart width={730} height={250} data={monthlyExpenditure}>
-            <XAxis dataKey="monthName" />
-            <YAxis />
-            <Bar dataKey="income" fill="#41FF71" />
-            <Bar dataKey="expenses" fill="#FF4141" />
-            <Legend />
-          </BarChart>
-        </ResponsiveContainer>
+        className={`min-h-[400px] max-md:min-h-[200px] w-[calc(100vw-10rem)] max-[900px]:w-[calc(100vw-5rem)] ${
+          transactions.length === 0 ? "hidden" : ""
+        }`}
+      >
+        <BarChart width={730} height={250} data={monthlyExpenditure}>
+          <XAxis dataKey="monthName" />
+          <YAxis />
+          <Bar dataKey="income" fill="#41FF71" barSize={"5%"} />
+          <Bar dataKey="expenses" fill="#FF4141" barSize={"5%"} />
+          <Legend />
+        </BarChart>
+      </ResponsiveContainer>
 
       <div className="h-fit w-[calc(100vw-10rem)] max-[900px]:w-[calc(100vw-5rem)] flex flex-col items-start justify-start max-sm:items-center">
         <div
@@ -229,7 +247,6 @@ export default function Home() {
           )}
         </div>
       </div>
-
     </Container>
   );
 }
