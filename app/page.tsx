@@ -178,8 +178,8 @@ export default function Home() {
               </>
             ))}
             {transactions.length === 0 && (
-              <span className="text-gray self-center text-2xl">
-                No transactions
+              <span className="text-gray self-center text-center text-lg">
+                No transactions. Add transactions <Link href="/add" size="lg" as={NextLink}>here</Link>
               </span>
             )}
           </div>

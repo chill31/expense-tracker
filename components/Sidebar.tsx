@@ -27,14 +27,14 @@ export default function Sidebar({ currentPath }: { currentPath: string }) {
       </button>
 
       <div
-        className={`fixed top-0 left-0 z-[30] h-screen w-screen bg-black/50 transition-opacity ${
+        className={`fixed top-0 left-0 z-[30] min-h-screen w-screen bg-black/50 transition-opacity overflow-x-auto ${
           isOpen ? "scale-100 opacity-100" : "scale-0 opacity-0"
         }`}
         onClick={(e) => checkAndClose(e)}
       ></div>
 
       <div
-        className={`fixed top-0 left-0 z-[40] w-64 h-screen flex flex-col items-center justify-center gap-8 max-sm:gap-6 bg-dark-secondary transition-transform ${
+        className={`fixed top-0 left-0 z-[40] w-72 h-screen flex flex-col items-center justify-center gap-8 max-sm:gap-6 bg-dark-secondary transition-transform overflow-x-auto ${
           isOpen ? "translate-x-0" : "translate-x-[-100%]"
         }`}
       >
@@ -57,7 +57,17 @@ export default function Sidebar({ currentPath }: { currentPath: string }) {
           as={NextLink}
           tabIndex={isOpen ? 0 : -1}
         >
-          Transactions
+          View Transactions
+        </Link>
+        <Link
+          href="/add"
+          className={`text-xl text-white rounded-e-full px-8 py-3 w-[90%] self-start ${
+            currentPath === "/add" ? "bg-white/20" : "bg-white/5"
+          }`}
+          as={NextLink}
+          tabIndex={isOpen ? 0 : -1}
+        >
+          Add Transactions
         </Link>
         <Link
           href="/budgets"

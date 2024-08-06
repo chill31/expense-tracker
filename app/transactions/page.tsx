@@ -4,10 +4,9 @@ import { Transaction, Category } from "@/types/types";
 
 import { useEffect, useState } from "react";
 
+import NextLink from "next/link";
+
 import Container from "@/components/Container";
-import { Input } from "@nextui-org/input";
-import { Select, SelectItem } from "@nextui-org/select";
-import { DatePicker } from "@nextui-org/date-picker";
 import { Button } from "@nextui-org/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@nextui-org/popover";
 import {
@@ -19,20 +18,11 @@ import {
   TableCell,
 } from "@nextui-org/table";
 
+import { Link } from "@nextui-org/link";
 import { SortDescriptor } from "@nextui-org/react";
 import { Skeleton } from "@nextui-org/skeleton";
 import { Spinner } from "@nextui-org/spinner";
-import { Card, CardHeader, CardBody, CardFooter } from "@nextui-org/card";
-
-import {
-  DateValue,
-  now,
-  getLocalTimeZone,
-  today,
-  parseDate,
-} from "@internationalized/date";
-import { I18nProvider } from "@react-aria/i18n";
-import { BsChevronDown, BsTrash3 } from "react-icons/bs";
+import { BsTrash3 } from "react-icons/bs";
 import CategoryIcon from "@/components/CategoryIcon";
 
 const categories: Category[] = [
@@ -77,60 +67,9 @@ export default function Transactions() {
 
   const totalExpenditure = transactions.reduce(
     (acc, curr) =>
-      curr.category !== "income" ? acc - curr.amount : acc + curr.amount,
+      curr.type !== "income" ? acc - curr.amount : acc + curr.amount,
     0
   );
-
-  const [cardVisible, setCardVisible] = useState(false);
-
-  const [transactionNameInputValue, setTransactionNameInputValue] =
-    useState("");
-  const [transactionAmountInputValue, setTransactionAmountInputValue] =
-    useState("");
-  const [transactionCategory, setTransactionCategory] = useState<any>(
-    new Set([])
-  );
-  const [date, setDate] = useState<DateValue>(today(getLocalTimeZone()));
-
-  const [isFormInvalid, setIsFormInvalid] = useState(false);
-
-  const currentDate = now(getLocalTimeZone());
-  const previousYear = currentDate.year - 1;
-  const janFirstPreviousYear = parseDate(`${previousYear}-01-01`);
-
-  function addTransaction() {
-    if (
-      transactionNameInputValue.trim() === "" ||
-      isNaN(parseFloat(transactionAmountInputValue)) ||
-      transactionCategory.size === 0 ||
-      date > now(getLocalTimeZone()) ||
-      date < janFirstPreviousYear
-    ) {
-      setIsFormInvalid(true);
-      setTimeout(() => {
-        setIsFormInvalid(false);
-      }, 2000);
-      return;
-    }
-
-    const newTransaction: Transaction = {
-      transactionName: transactionNameInputValue,
-      amount: parseFloat(transactionAmountInputValue),
-      category: transactionCategory.values().next().value,
-      date: new Date(date.toString()),
-    };
-    setTransactions((old) => [newTransaction, ...old]);
-    setOriginalTransactions((old) => [newTransaction, ...old]);
-    setTransactionNameInputValue("");
-    setTransactionAmountInputValue("");
-    setTransactionCategory(new Set([]));
-    setDate(today(getLocalTimeZone()));
-
-    localStorage.setItem(
-      "transactions",
-      JSON.stringify([newTransaction, ...transactions])
-    );
-  }
 
   function removeTransaction(transactionKey: number) {
     const newTransactions = transactions.filter((_, k) => k !== transactionKey);
@@ -150,7 +89,15 @@ export default function Transactions() {
     }
 
     const sortedTransactions = [...transactions].sort((a, b) => {
-      if (column === "amount") {
+      if (column === "type") {
+        return direction === "ascending"
+          ? a.type === "income"
+            ? -1
+            : 1
+          : a.type === "income"
+          ? 1
+          : -1;
+      } else if (column === "amount") {
         return direction === "ascending"
           ? a.amount - b.amount
           : b.amount - a.amount;
@@ -203,137 +150,14 @@ export default function Transactions() {
         </h2>
       </div>
 
-      <Card className="flex flex-col w-full max-w-[50rem] self-start gap-8 p-4 max-sm:p-2 bg-dark-secondary/20">
-        <CardHeader
-          className="text-2xl font-bold flex items-center justify-center max-sm:justify-start cursor-pointer"
-          onClick={() => setCardVisible((prev) => !prev)}
-        >
-          Add Transaction
-          <BsChevronDown
-            className={`text-xl ml-2 absolute right-8 max-sm:right-4 transition-transform ${
-              cardVisible && "rotate-180"
-            }`}
-          />
-        </CardHeader>
-
-        <CardBody className={`gap-8 ${!cardVisible && "hidden"}`}>
-          <Input
-            isClearable={true}
-            aria-label="Enter transaction name"
-            placeholder="Enter a name for your transaction"
-            radius="sm"
-            className="w-full"
-            label="Transaction Name"
-            labelPlacement="outside"
-            classNames={{
-              inputWrapper: "bg-white/10 hover:!bg-dark-secondary/50",
-              label: "!text-gray",
-            }}
-            size="lg"
-            maxLength={50}
-            value={transactionNameInputValue}
-            onValueChange={setTransactionNameInputValue}
-          />
-
-          <Select
-            aria-label="Select transaction category"
-            className="w-64 max-w-full"
-            radius="sm"
-            size="lg"
-            placeholder="Select a category"
-            selectedKeys={transactionCategory}
-            onSelectionChange={setTransactionCategory}
-            classNames={{
-              label: "!text-gray",
-            }}
-          >
-            {categories.map((category) => (
-              <SelectItem
-                key={category}
-                value={category}
-                startContent={<CategoryIcon category={category} />}
-              >
-                {category}
-              </SelectItem>
-            ))}
-          </Select>
-
-          <div className="flex flex-wrap w-full items-center justify-start gap-2">
-            <Input
-              className="w-64 max-w-full"
-              aria-roledescription="number input"
-              aria-label="Enter transaction amount"
-              placeholder="00.00"
-              size="lg"
-              radius="sm"
-              label="Transaction Amount"
-              labelPlacement="outside"
-              classNames={{
-                inputWrapper: "bg-white/10 hover:!bg-dark-secondary/50",
-                label: "!text-gray",
-              }}
-              value={transactionAmountInputValue}
-              onValueChange={setTransactionAmountInputValue}
-              startContent={<span className="text-lg text-gray">₹</span>}
-            />
-
-            <I18nProvider locale="en-IN">
-              <DatePicker
-                value={date}
-                onChange={setDate}
-                className="w-64 max-w-full"
-                size="lg"
-                radius="sm"
-                aria-label="Transaction date"
-                label="Transaction Date"
-                labelPlacement="outside"
-                minValue={janFirstPreviousYear}
-                maxValue={today(getLocalTimeZone())}
-                dateInputClassNames={{
-                  errorMessage:
-                    "absolute top-full w-56 max-w-[calc(100vw-2rem)]",
-                  label: "!text-gray text-md",
-                  inputWrapper: "bg-white/10 hover:!bg-dark-secondary/50",
-                }}
-              />
-            </I18nProvider>
-          </div>
-        </CardBody>
-        <CardFooter
-          className={`w-full flex justify-end items-center ${
-            !cardVisible && "hidden"
-          }`}
-        >
-          <Popover isOpen={isFormInvalid} radius="sm">
-            <PopoverTrigger>
-              <Button
-                radius="none"
-                size="lg"
-                className="bg-primary rounded-md z-0"
-                onClick={addTransaction}
-                disabled={isFormInvalid}
-              >
-                Add
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="bg-error">
-              <div className="px-2 py-4">
-                <div className="text-lg font-bold">Error</div>
-                <div className="text-md">
-                  Fill out the specifications properly
-                </div>
-              </div>
-            </PopoverContent>
-          </Popover>
-        </CardFooter>
-      </Card>
+      <span className="text-lg">Add transactions <Link href='/add' className="text-lg underline">here</Link></span>
 
       <div className="w-full flex flex-col gap-2">
         <Button
           className="rounded-md self-end"
           size="md"
-          color='default'
-          onClick={resetSort}
+          color="default"
+          onPress={() => resetSort()}
         >
           Reset Sort
         </Button>
@@ -345,22 +169,17 @@ export default function Transactions() {
           classNames={{}}
         >
           <TableHeader>
+            <TableColumn key="type" allowsSorting className="w-[10ch]">
+              TYPE
+            </TableColumn>
             <TableColumn key="name" allowsSorting className="w-[30ch]">
-              NAME{" "}
-              {sortConfig.column === "name" &&
-                (sortConfig.direction === "ascending"
-                  ? " (alphabetical)"
-                  : "(reversed)")}
+              NAME
             </TableColumn>
             <TableColumn key="category" allowsSorting className="w-[20ch]">
               CATEGORY
             </TableColumn>
             <TableColumn key="amount" allowsSorting className="w-[20ch]">
-              AMOUNT{" "}
-              {sortConfig.column === "amount" &&
-                (sortConfig.direction === "ascending"
-                  ? " (lowest)"
-                  : "(highest)")}
+              AMOUNT
             </TableColumn>
             <TableColumn key="date" allowsSorting className="w-[25ch]">
               DATE{" "}
@@ -372,19 +191,46 @@ export default function Transactions() {
             <TableColumn className="w-2"> </TableColumn>
           </TableHeader>
           <TableBody
-            emptyContent={"No transactions to display."}
+            emptyContent={
+              <span>
+                No transactions to display. Go to the{" "}
+                <Link href="/add" as={NextLink}>
+                  add transactions
+                </Link>{" "}
+                page to add your transactions
+              </span>
+            }
             isLoading={isLoading}
             loadingContent={<Spinner color="default" size="lg" />}
           >
             {transactions.map((item, k) => (
               <TableRow key={item.transactionName}>
+                <TableCell>
+                  {item.type === "income" ? (
+                    <span className="bg-success h-7 aspect-square rounded-full flex items-center justify-center text-3xl">
+                      +
+                    </span>
+                  ) : (
+                    <span className="bg-error h-7 aspect-square rounded-full flex items-center justify-center text-3xl">
+                      -
+                    </span>
+                  )}
+                </TableCell>
                 <TableCell>{item.transactionName}</TableCell>
                 <TableCell>
                   <span className="flex items-center gap-1">
                     <CategoryIcon category={item.category} /> {item.category}
                   </span>
                 </TableCell>
-                <TableCell>{formatNumber(item.amount)}</TableCell>
+                <TableCell
+                  className={`${
+                    item.type === "income" ? "text-success" : "text-error"
+                  }`}
+                >
+                  {(item.type === "income" ? "+" : "-") +
+                    formatNumber(item.amount) +
+                    " ₹"}
+                </TableCell>
                 <TableCell className="w-[20rem] min-w-max">
                   {new Date(item.date).toDateString()}
                 </TableCell>
@@ -393,7 +239,7 @@ export default function Transactions() {
                     isIconOnly={true}
                     className="rounded-md bg-error"
                     tabIndex={0}
-                    onClick={() => {
+                    onPress={() => {
                       removeTransaction(k);
                     }}
                   >

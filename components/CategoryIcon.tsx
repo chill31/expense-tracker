@@ -1,5 +1,5 @@
 import { Category } from "@/types/types";
-import { BsBag, BsCapsulePill, BsCart3, BsCreditCard, BsGift, BsLightningFill, BsAsterisk, BsCashCoin, BsController } from "react-icons/bs";
+import { BsBag, BsCapsulePill, BsCart3, BsCreditCard, BsGift, BsLightningFill, BsAsterisk, BsCashCoin, BsController, BsDash } from "react-icons/bs";
 
 export default function CategoryIcon({ category, className }: { category: Category, className?: string }) {
   return (
