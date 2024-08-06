@@ -34,7 +34,6 @@ const categories: Category[] = [
   "loans",
   "gifts",
   "misc",
-  "income",
 ];
 
 export default function Transactions() {

@@ -11,7 +11,6 @@ export default function CategoryIcon({ category, className }: { category: Catego
       {category === 'shopping' && <BsCart3 className={className} />}
       {category === 'loans' && <BsCreditCard className={className} />}
       {category === 'gifts' && <BsGift className={className} />}
-      {category === 'income' && <BsCashCoin className={className} />}
       {category === 'misc' && <BsAsterisk className={className} />}
     </>
   )
