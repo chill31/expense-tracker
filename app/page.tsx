@@ -109,8 +109,7 @@ export default function Home() {
       return num.toLocaleString();
     }
   }
-
-  // get the three newest transactions according to their date
+  
   const recentTransactions = transactions
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
     .slice(0, 3);
