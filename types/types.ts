@@ -1,4 +1,4 @@
-export type Category = 'medical' | 'entertainment' | 'food' | 'utility' | 'shopping' | 'loans' | 'gifts' | 'misc' | 'income';
+export type Category = 'medical' | 'entertainment' | 'food' | 'utility' | 'shopping' | 'loans' | 'gifts' | 'misc';
 
 export type Transaction = {
   category: Category;

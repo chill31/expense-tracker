@@ -53,11 +53,11 @@ export default function Home() {
 
   const totalExpenditure = transactions.reduce(
     (acc, curr) =>
-      curr.category !== "income" ? acc - curr.amount : acc + curr.amount,
+      curr.type !== "income" ? acc - curr.amount : acc + curr.amount,
     0
   );
   const onlyExpensesTransactions = transactions.filter(
-    (item) => item.category !== "income"
+    (item) => item.type !== "income"
   );
 
   const monthlyExpenditure = Array.from({ length: 12 }, (_, i) => ({
@@ -72,7 +72,7 @@ export default function Home() {
     const month = date.getMonth();
     const amount = transaction.amount;
 
-    if (transaction.category !== "income") {
+    if (transaction.type !== "income") {
       monthlyExpenditure[month].expenses += amount;
     } else {
       monthlyExpenditure[month].income += amount;
@@ -81,7 +81,7 @@ export default function Home() {
 
   const categoryExpenses: { [key: string]: number } = transactions.reduce(
     (acc, curr) => {
-      if (curr.category !== "income") {
+      if (curr.type !== "income") {
         if (acc[curr.category]) {
           acc[curr.category] += curr.amount;
         } else {
@@ -167,10 +167,10 @@ export default function Home() {
                   </div>
                   <span
                     className={`${
-                      item.category !== "income" ? "text-error" : "text-success"
+                      item.type !== "income" ? "text-error" : "text-success"
                     } text-xl max-sm:text-base flex items-center justify-end overflow-hidden text-ellipsis whitespace-nowrap min-w-[30%]`}
                   >
-                    {item.category !== "income" ? "-" : "+"}
+                    {item.type !== "income" ? "-" : "+"}
                     {formatNumber(item.amount)} ₹
                   </span>
                 </div>
