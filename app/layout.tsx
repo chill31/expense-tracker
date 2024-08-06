@@ -16,7 +16,7 @@ export const metadata: Metadata = {
       description: 'Expense tracker web app created with the help of Next.js and Tailwind CSS.',
       url: 'https://expensz.vercel.app',
       siteName: 'Expensz',
-      images: '/og-image.png',
+      images: '/logo-with-text.png',
       locale: 'en_IN',
       type: 'website',
     },
