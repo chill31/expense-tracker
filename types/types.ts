@@ -1,7 +1,8 @@
 export type Category = 'medical' | 'entertainment' | 'food' | 'utility' | 'shopping' | 'loans' | 'gifts' | 'misc';
+export type IncomeCategory = 'salary' | 'business' | 'freelance' | 'gifts' | 'misc';
 
 export type Transaction = {
-  category: Category;
+  category: Category | IncomeCategory;
   transactionName: string;
   amount: number;
   date: Date;

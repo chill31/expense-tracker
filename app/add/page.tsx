@@ -2,9 +2,9 @@
 
 import Container from "@/components/Container";
 
-import { Transaction, Category } from "@/types/types";
+import { Transaction, Category, IncomeCategory, Budget } from "@/types/types";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { Input } from "@nextui-org/input";
 import { Select, SelectItem } from "@nextui-org/select";
@@ -13,8 +13,6 @@ import { Button } from "@nextui-org/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@nextui-org/popover";
 
 import { Card, CardBody, CardFooter } from "@nextui-org/card";
-import { Link } from "@nextui-org/link";
-import NextLink from "next/link";
 
 import {
   DateValue,
@@ -38,11 +36,27 @@ const categories: Category[] = [
   "misc",
 ];
 
+const incomeCategories: IncomeCategory[] = [
+  "salary",
+  "business",
+  "freelance",
+  "gifts",
+  "misc",
+];
+
 const types = ["expense", "income"];
 
 export default function AddTransaction() {
-
   const [transactions, setTransactions] = useState<Transaction[]>([]);
+
+  useEffect(() => {
+    const storedTransactions = localStorage.getItem("transactions");
+
+    if (storedTransactions) {
+      setTransactions(JSON.parse(storedTransactions));
+    }
+  }, []);
+
   const [transactionNameInputValue, setTransactionNameInputValue] =
     useState("");
   const [transactionAmountInputValue, setTransactionAmountInputValue] =
@@ -60,11 +74,17 @@ export default function AddTransaction() {
   const previousYear = currentDate.year - 1;
   const janFirstPreviousYear = parseDate(`${previousYear}-01-01`);
 
+  // so that users cant add invalid category to either expense or income, since both have different categories.
+  function setTypeAndCategory([type]: any) {
+    setTransactionType(type);
+    setTransactionCategory(new Set([]));
+  }
+
   function addTransaction() {
-    console.log('caled')
     if (
       transactionNameInputValue.trim() === "" ||
       isNaN(parseFloat(transactionAmountInputValue)) ||
+      parseFloat(transactionAmountInputValue) < 0 ||
       transactionType.size === 0 ||
       transactionCategory.size === 0 ||
       date > now(getLocalTimeZone()) ||
@@ -73,7 +93,7 @@ export default function AddTransaction() {
       setIsFormInvalid(true);
       setTimeout(() => {
         setIsFormInvalid(false);
-      }, 3000);
+      }, 2000);
       return;
     }
 
@@ -84,10 +104,12 @@ export default function AddTransaction() {
       date: new Date(date.toString()),
       type: transactionType.values().next().value,
     };
+    setTransactions((prev) => [newTransaction, ...prev]);
+    setBudgets();
+
     setTransactionNameInputValue("");
     setTransactionAmountInputValue("");
     setTransactionCategory(new Set([]));
-    setTransactions((prev) => [newTransaction, ...prev]);
     setDate(today(getLocalTimeZone()));
 
     localStorage.setItem(
@@ -98,12 +120,31 @@ export default function AddTransaction() {
     setAdded(true);
     setTimeout(() => {
       setAdded(false);
-    }, 3000);
+    }, 2000);
+  }
+
+  function setBudgets() {
+    if (transactionType.values().next().value === "income") return;
+    const storedBudgets = localStorage.getItem("budgets") ?? "[]";
+
+    const budgets: Budget[] = JSON.parse(storedBudgets);
+
+    const category = transactionCategory.values().next().value;
+    const amount = parseFloat(transactionAmountInputValue);
+
+    const categoryBudget = budgets.find(
+      (budget) => budget.category === category
+    );
+    if (!categoryBudget || categoryBudget.budget === 0) return;
+
+    categoryBudget.spent += amount;
+
+    localStorage.setItem("budgets", JSON.stringify(budgets));
   }
 
   return (
     <Container>
-      <h1 className="text-4xl font-bold">Add Transactions</h1>
+      <h1 className="text-4xl font-bold text-center">Add Transactions</h1>
 
       <Card className="flex flex-col w-full max-w-[50rem] gap-8 p-4 max-sm:p-2 bg-transparent shadow-none">
         <CardBody className="gap-8 flex flex-wrap [flex-direction:unset]">
@@ -126,7 +167,7 @@ export default function AddTransaction() {
             size="lg"
             placeholder="Select type of transaction"
             selectedKeys={transactionType}
-            onSelectionChange={setTransactionType}
+            onSelectionChange={(...args) => setTypeAndCategory(args)}
             disallowEmptySelection={true}
             classNames={{
               label: "!text-gray",
@@ -142,59 +183,84 @@ export default function AddTransaction() {
               </SelectItem>
             ))}
           </Select>
-
-          <Select
-            aria-label="Select transaction category"
-            className="w-64 max-w-full"
-            radius="sm"
-            size="lg"
-            placeholder="Select a category"
-            selectedKeys={transactionCategory}
-            onSelectionChange={setTransactionCategory}
-            disallowEmptySelection={true}
-            classNames={{
-              label: "!text-gray",
-            }}
-          >
-            {categories.map((category) => (
-              <SelectItem
-                key={category}
-                value={category}
-                startContent={<CategoryIcon category={category} />}
-              >
-                {category}
-              </SelectItem>
-            ))}
-          </Select>
-
-            <Input
+          {transactionType.values().next().value === "income" && (
+            <Select
+              aria-label="Select transaction category"
               className="w-64 max-w-full"
-              aria-roledescription="number input"
-              aria-label="Enter transaction amount"
-              placeholder="00.00"
+              radius="sm"
+              size="lg"
+              placeholder="Select a category"
+              selectedKeys={transactionCategory}
+              onSelectionChange={setTransactionCategory}
+              disallowEmptySelection={true}
+              classNames={{
+                label: "!text-gray",
+              }}
+            >
+              {incomeCategories.map((category) => (
+                <SelectItem
+                  key={category}
+                  value={category}
+                  startContent={<CategoryIcon category={category} />}
+                >
+                  {category}
+                </SelectItem>
+              ))}
+            </Select>
+          )}
+          {transactionType.values().next().value !== "income" && (
+            <Select
+              aria-label="Select transaction category"
+              className="w-64 max-w-full"
+              radius="sm"
+              size="lg"
+              placeholder="Select a category"
+              selectedKeys={transactionCategory}
+              onSelectionChange={setTransactionCategory}
+              disallowEmptySelection={true}
+              classNames={{
+                label: "!text-gray",
+              }}
+            >
+              {categories.map((category) => (
+                <SelectItem
+                  key={category}
+                  value={category}
+                  startContent={<CategoryIcon category={category} />}
+                >
+                  {category}
+                </SelectItem>
+              ))}
+            </Select>
+          )}
+
+          <Input
+            className="w-64 max-w-full"
+            aria-roledescription="number input"
+            aria-label="Enter transaction amount"
+            placeholder="00.00"
+            size="lg"
+            radius="sm"
+            value={transactionAmountInputValue}
+            onValueChange={setTransactionAmountInputValue}
+            startContent={<span className="text-lg text-gray">₹</span>}
+          />
+
+          <I18nProvider locale="en-IN">
+            <DatePicker
+              value={date}
+              onChange={setDate}
+              className="w-64 max-w-full"
               size="lg"
               radius="sm"
-              value={transactionAmountInputValue}
-              onValueChange={setTransactionAmountInputValue}
-              startContent={<span className="text-lg text-gray">₹</span>}
+              aria-label="Transaction date"
+              minValue={janFirstPreviousYear}
+              maxValue={today(getLocalTimeZone())}
+              dateInputClassNames={{
+                errorMessage: "absolute top-full w-56 max-w-[calc(100vw-2rem)]",
+              }}
             />
-
-            <I18nProvider locale="en-IN">
-              <DatePicker
-                value={date}
-                onChange={setDate}
-                className="w-64 max-w-full"
-                size="lg"
-                radius="sm"
-                aria-label="Transaction date"
-                minValue={janFirstPreviousYear}
-                maxValue={today(getLocalTimeZone())}
-                dateInputClassNames={{
-                  errorMessage:
-                    "absolute top-full w-56 max-w-[calc(100vw-2rem)]",
-                }}
-              />
-            </I18nProvider>
+          </I18nProvider>
         </CardBody>
         <CardFooter className="w-full flex justify-end items-center">
           <Popover isOpen={isFormInvalid} radius="sm">
@@ -202,12 +268,14 @@ export default function AddTransaction() {
               <Button
                 radius="none"
                 size="lg"
-                className={`${added ? 'bg-success' : 'bg-primary'} rounded-md z-0`}
-                startContent={added ? <BsCheckLg /> : ''}
+                className={`${
+                  added ? "bg-success" : "bg-primary"
+                } rounded-md z-0`}
+                startContent={added ? <BsCheckLg /> : ""}
                 onClick={addTransaction}
                 disabled={isFormInvalid || added}
               >
-                {added ? 'Added' : 'Add'}
+                {added ? "Added" : "Add"}
               </Button>
             </PopoverTrigger>
             <PopoverContent className="bg-error">

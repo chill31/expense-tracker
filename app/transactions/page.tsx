@@ -1,14 +1,13 @@
 "use client";
 
-import { Transaction, Category } from "@/types/types";
+import { Transaction } from "@/types/types";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import NextLink from "next/link";
 
 import Container from "@/components/Container";
 import { Button } from "@nextui-org/button";
-import { Popover, PopoverContent, PopoverTrigger } from "@nextui-org/popover";
 import {
   Table,
   TableHeader,
@@ -24,17 +23,6 @@ import { Skeleton } from "@nextui-org/skeleton";
 import { Spinner } from "@nextui-org/spinner";
 import { BsTrash3 } from "react-icons/bs";
 import CategoryIcon from "@/components/CategoryIcon";
-
-const categories: Category[] = [
-  "medical",
-  "entertainment",
-  "food",
-  "utility",
-  "shopping",
-  "loans",
-  "gifts",
-  "misc",
-];
 
 export default function Transactions() {
   function formatNumber(num: number) {
@@ -64,17 +52,31 @@ export default function Transactions() {
     }
   }, []);
 
-  const totalExpenditure = transactions.reduce(
-    (acc, curr) =>
-      curr.type !== "income" ? acc - curr.amount : acc + curr.amount,
-    0
-  );
+  const totalExpenditure = useMemo(() => {
+    return transactions.reduce(
+      (acc, curr) =>
+        curr.type !== "income" ? acc - curr.amount : acc + curr.amount,
+      0
+    );
+  }, [transactions]);
 
   function removeTransaction(transactionKey: number) {
     const newTransactions = transactions.filter((_, k) => k !== transactionKey);
     setTransactions(newTransactions);
     setOriginalTransactions(newTransactions);
     localStorage.setItem("transactions", JSON.stringify(newTransactions));
+
+    const transaction = transactions[transactionKey];
+    const storedBudgets = localStorage.getItem("budgets");
+    if (!storedBudgets) return;
+    const budgets = JSON.parse(storedBudgets);
+    if (transaction.type === "income") return;
+    const categoryBudget = budgets.find(
+      (budget: { category: string }) => budget.category === transaction.category
+    );
+    if (!categoryBudget || categoryBudget.budget === 0) return;
+    categoryBudget.spent -= transaction.amount;
+    localStorage.setItem("budgets", JSON.stringify(budgets));
   }
 
   const [sortConfig, setSortConfig] = useState<{
@@ -149,7 +151,12 @@ export default function Transactions() {
         </h2>
       </div>
 
-      <span className="text-lg">Add transactions <Link href='/add' className="text-lg underline">here</Link></span>
+      <span className="text-lg">
+        Add transactions{" "}
+        <Link href="/add" className="text-lg underline" as={NextLink}>
+          here
+        </Link>
+      </span>
 
       <div className="w-full flex flex-col gap-2">
         <Button
@@ -181,11 +188,7 @@ export default function Transactions() {
               AMOUNT
             </TableColumn>
             <TableColumn key="date" allowsSorting className="w-[25ch]">
-              DATE{" "}
-              {sortConfig.column === "date" &&
-                (sortConfig.direction === "ascending"
-                  ? " (oldest)"
-                  : "(newest)")}
+              DATE
             </TableColumn>
             <TableColumn className="w-2"> </TableColumn>
           </TableHeader>

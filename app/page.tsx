@@ -21,7 +21,7 @@ import { Divider } from "@nextui-org/divider";
 
 import BudgetCard from "@/components/BudgetCard";
 import CategoryIcon from "@/components/CategoryIcon";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import NextLink from "next/link";
 
 const colors = [
@@ -36,6 +36,17 @@ const colors = [
 ];
 
 export default function Home() {
+  
+  function formatNumber(num: number) {
+    if (num >= 10000000) {
+      return Math.floor(num / 1000000) / 10 + " Cr";
+    } else if (num >= 100000) {
+      return Math.floor(num / 10000) / 10 + " L";
+    } else {
+      return num.toLocaleString();
+    }
+  }
+
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [budgets, setBudgets] = useState<Budget[]>([]);
 
@@ -51,68 +62,74 @@ export default function Home() {
     }
   }, []);
 
-  const totalExpenditure = transactions.reduce(
-    (acc, curr) =>
-      curr.type !== "income" ? acc - curr.amount : acc + curr.amount,
-    0
-  );
-  const onlyExpensesTransactions = transactions.filter(
-    (item) => item.type !== "income"
-  );
+  const {
+    totalExpenditure,
+    onlyExpensesTransactions,
+    monthlyExpenditure,
+    categoryExpensesArray,
+    recentTransactions,
+  } = useMemo(() => {
+    const totalExpenditure = transactions.reduce(
+      (acc, curr) =>
+        curr.type !== "income" ? acc - curr.amount : acc + curr.amount,
+      0
+    );
+    const onlyExpensesTransactions = transactions.filter(
+      (item) => item.type !== "income"
+    );
 
-  const monthlyExpenditure = Array.from({ length: 12 }, (_, i) => ({
-    monthNumber: i,
-    monthName: new Date(0, i).toLocaleString("default", { month: "short" }),
-    expenses: 0,
-    income: 0,
-  }));
-
-  transactions.forEach((transaction) => {
-    const date = new Date(transaction.date);
-    const month = date.getMonth();
-    const amount = transaction.amount;
-
-    if (transaction.type !== "income") {
-      monthlyExpenditure[month].expenses += amount;
-    } else {
-      monthlyExpenditure[month].income += amount;
-    }
-  });
-
-  const categoryExpenses: { [key: string]: number } = transactions.reduce(
-    (acc, curr) => {
-      if (curr.type !== "income") {
-        if (acc[curr.category]) {
-          acc[curr.category] += curr.amount;
-        } else {
-          acc[curr.category] = curr.amount;
-        }
-      }
-      return acc;
-    },
-    {} as { [key: string]: number }
-  );
-
-  const categoryExpensesArray = Object.entries(categoryExpenses).map(
-    ([category, amount]) => ({
-      category,
-      amount,
-    })
-  );
-
-  function formatNumber(num: number) {
-    if (num >= 10000000) {
-      return Math.floor(num / 1000000) / 10 + " Cr";
-    } else if (num >= 100000) {
-      return Math.floor(num / 10000) / 10 + " L";
-    } else {
-      return num.toLocaleString();
-    }
-  }
+    const monthlyExpenditure = Array.from({ length: 12 }, (_, i) => ({
+      monthNumber: i,
+      monthName: new Date(0, i).toLocaleString("default", { month: "short" }),
+      expenses: 0,
+      income: 0,
+    }));
+    
+    transactions.forEach((transaction) => {
+      const date = new Date(transaction.date);
+      const month = date.getMonth();
+      const amount = transaction.amount;
   
-  const recentTransactions = transactions
+      if (transaction.type !== "income") {
+        monthlyExpenditure[month].expenses += amount;
+      } else {
+        monthlyExpenditure[month].income += amount;
+      }
+    });
+
+    const categoryExpenses: { [key: string]: number } = transactions.reduce(
+      (acc, curr) => {
+        if (curr.type !== "income") {
+          if (acc[curr.category]) {
+            acc[curr.category] += curr.amount;
+          } else {
+            acc[curr.category] = curr.amount;
+          }
+        }
+        return acc;
+      },
+      {} as { [key: string]: number }
+    );
+  
+    const categoryExpensesArray = Object.entries(categoryExpenses).map(
+      ([category, amount]) => ({
+        category,
+        amount,
+      })
+    );
+
+    const recentTransactions = transactions
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
     .slice(0, 3);
+
+    return {
+      totalExpenditure,
+      onlyExpensesTransactions,
+      monthlyExpenditure,
+      categoryExpensesArray,
+      recentTransactions,
+    };
+  }, [transactions]);
 
   return (
     <Container>
@@ -173,19 +190,22 @@ export default function Home() {
                     {formatNumber(item.amount)} ₹
                   </span>
                 </div>
-                {index !== 2 && <Divider className="my-4"></Divider>}
+                {(index !== (recentTransactions.length - 1)) && <Divider className="my-4"></Divider>}
               </>
             ))}
             {transactions.length === 0 && (
-              <span className="text-gray self-center text-center text-lg">
-                No transactions. Add transactions <Link href="/add" size="lg" as={NextLink}>here</Link>
+              <span className="text-gray self-center justify-self-center text-center text-lg">
+                No transactions. Add transactions{" "}
+                <Link href="/add" size="lg" as={NextLink}>
+                  here
+                </Link>
               </span>
             )}
           </div>
         </div>
         <ResponsiveContainer
           className={`flex-[5] h-fit min-h-[400px] flex items-center justify-center self-center ${
-            transactions.length === 0 ? "hidden" : ""
+            categoryExpensesArray.length === 0 ? "hidden" : ""
           }`}
         >
           <PieChart>
@@ -202,9 +222,9 @@ export default function Home() {
             <Legend iconSize={20} iconType="plainline" />
           </PieChart>
         </ResponsiveContainer>
-        {transactions.length === 0 && (
+        {categoryExpensesArray.length === 0 && (
           <span className="h-full w-full flex items-center justify-center text-gray self-center text-2xl max-md:mt-24">
-            No Data To Visualize
+            No Expenses To Visualize
           </span>
         )}
       </div>
