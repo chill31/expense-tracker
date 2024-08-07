@@ -11,7 +11,6 @@ type BudgetCardProps = {
 import { Card, CardFooter, CardHeader } from "@nextui-org/card";
 import { CircularProgress } from "@nextui-org/progress";
 import { Chip } from "@nextui-org/chip";
-import { Divider } from "@nextui-org/react";
 import { BsExclamationTriangle } from "react-icons/bs";
 
 export default function BudgetCard({
@@ -48,11 +47,7 @@ export default function BudgetCard({
         </Chip>
       )}
       <Card
-        className={`${
-          categoryName.toLowerCase() === "total"
-            ? "bg-dark-secondary"
-            : "bg-dark-secondary/50"
-        } w-[250px] h-fit p-4 flex flex-col items-center justify-center gap-2 relative isolate`}
+        className="bg-dark-secondary/50 w-[250px] h-fit p-4 flex flex-col items-center justify-center gap-2 relative isolate"
       >
         <CardHeader className="flex items-center justify-center text-xl text-gray">
           {categoryName}
