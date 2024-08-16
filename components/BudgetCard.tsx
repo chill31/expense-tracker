@@ -12,6 +12,7 @@ import { Card, CardFooter, CardHeader } from "@nextui-org/card";
 import { CircularProgress } from "@nextui-org/progress";
 import { Chip } from "@nextui-org/chip";
 import { BsExclamationTriangle } from "react-icons/bs";
+import formatNumber from "@/utils/formatNumber";
 
 export default function BudgetCard({
   spent,
@@ -65,9 +66,9 @@ export default function BudgetCard({
         />
         <CardFooter className="flex items-center justify-center text-center text-gray">
           <span className={percent > 100 ? "text-error" : ""}>
-            {spent.toLocaleString()}
+            {formatNumber(spent)}
           </span>
-          /{total.toLocaleString()} ₹ used
+          /{formatNumber(total)} ₹ used
         </CardFooter>
       </Card>
     </div>

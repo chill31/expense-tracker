@@ -3,8 +3,6 @@
 import Container from "@/components/Container";
 import { Link } from "@nextui-org/link";
 
-import { Transaction, Budget } from "@/utils/types";
-
 import {
   BarChart,
   XAxis,
@@ -20,11 +18,12 @@ import {
 import { Divider } from "@nextui-org/divider";
 
 import BudgetCard from "@/components/BudgetCard";
-import CategoryIcon from "@/components/CategoryIcon";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import NextLink from "next/link";
 import formatNumber from "@/utils/formatNumber";
 import RecentTransaction from "@/components/RecentTransaction";
+
+import { useBudgets, useTransactions } from "@/utils/LocalStorage";
 
 const colors = [
   "#69BCC4", // Teal
@@ -38,20 +37,8 @@ const colors = [
 ];
 
 export default function Home() {
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [budgets, setBudgets] = useState<Budget[]>([]);
-
-  useEffect(() => {
-    const storedTransactions = localStorage.getItem("transactions");
-    const storedBudgets = localStorage.getItem("budgets");
-
-    if (storedTransactions) {
-      setTransactions(JSON.parse(storedTransactions));
-    }
-    if (storedBudgets) {
-      setBudgets(JSON.parse(storedBudgets));
-    }
-  }, []);
+  const [transactions] = useTransactions();
+  const [budgets] = useBudgets();
 
   const {
     totalExpenditure,

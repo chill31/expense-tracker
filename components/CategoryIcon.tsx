@@ -11,19 +11,21 @@ import {
   BsCashCoin,
   BsBriefcase,
   BsGlobe2,
+  BsBicycle,
 } from "react-icons/bs";
 
 export default function CategoryIcon({
   category,
   className,
 }: {
-  category: Category | IncomeCategory | "total";
+  category: Category | IncomeCategory
   className?: string;
 }) {
   return (
     <>
       {category === "medical" && <BsCapsulePill className={className} />}
       {category === "entertainment" && <BsController className={className} />}
+      {category === "travel" && <BsBicycle className={className} />}
       {category === "food" && <BsBag className={className} />}
       {category === "utility" && <BsLightningFill className={className} />}
       {category === "shopping" && <BsCart3 className={className} />}

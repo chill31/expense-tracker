@@ -4,7 +4,7 @@ import Container from "@/components/Container";
 
 import { Transaction, Category, IncomeCategory, Budget } from "@/utils/types";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import { Input } from "@nextui-org/input";
 import { Select, SelectItem } from "@nextui-org/select";
@@ -24,10 +24,12 @@ import {
 import { I18nProvider } from "@react-aria/i18n";
 import CategoryIcon from "@/components/CategoryIcon";
 import { BsCheckLg, BsDash, BsPlus } from "react-icons/bs";
+import { useTransactions } from "@/utils/LocalStorage";
 
 const categories: Category[] = [
   "medical",
   "entertainment",
+  "travel",
   "food",
   "utility",
   "shopping",
@@ -47,15 +49,7 @@ const incomeCategories: IncomeCategory[] = [
 const types = ["expense", "income"];
 
 export default function AddTransaction() {
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
-
-  useEffect(() => {
-    const storedTransactions = localStorage.getItem("transactions");
-
-    if (storedTransactions) {
-      setTransactions(JSON.parse(storedTransactions));
-    }
-  }, []);
+  const [transactions, setTransactions] = useTransactions();
 
   const [transactionNameInputValue, setTransactionNameInputValue] =
     useState("");
@@ -103,18 +97,14 @@ export default function AddTransaction() {
       date: new Date(date.toString()),
       type: transactionType.values().next().value,
     };
-    setTransactions((prev) => [newTransaction, ...prev]);
-    setBudgets();
+    const newTransactions = [newTransaction, ...transactions];
+    setTransactions(newTransactions);
+    updateBudgets();
 
     setTransactionNameInputValue("");
     setTransactionAmountInputValue("");
     setTransactionCategory(new Set([]));
     setDate(today(getLocalTimeZone()));
-
-    localStorage.setItem(
-      "transactions",
-      JSON.stringify([newTransaction, ...transactions])
-    );
 
     setAdded(true);
     setTimeout(() => {
@@ -122,7 +112,7 @@ export default function AddTransaction() {
     }, 2000);
   }
 
-  function setBudgets() {
+  function updateBudgets() {
     if (transactionType.values().next().value === "income") return;
     const storedBudgets = localStorage.getItem("budgets") ?? "[]";
 
@@ -265,11 +255,11 @@ export default function AddTransaction() {
           <Popover isOpen={isFormInvalid} radius="sm">
             <PopoverTrigger>
               <Button
-                radius="none"
+                radius="sm"
                 size="lg"
                 className={`${
                   added ? "bg-success" : "bg-primary"
-                } rounded-md z-0`}
+                } z-0`}
                 startContent={added ? <BsCheckLg /> : ""}
                 onClick={addTransaction}
                 disabled={isFormInvalid || added}

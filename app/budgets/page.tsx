@@ -2,19 +2,21 @@
 
 import CategoryIcon from "@/components/CategoryIcon";
 import Container from "@/components/Container";
-import { Budget, Category } from "@/utils/types";
+import { Category } from "@/utils/types";
 
 import { Select, SelectItem } from "@nextui-org/select";
 import { Input } from "@nextui-org/input";
 import { Button } from "@nextui-org/button";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import BudgetCard from "@/components/BudgetCard";
 import { Popover, PopoverContent, PopoverTrigger } from "@nextui-org/react";
 import { BsCheckLg } from "react-icons/bs";
+import { useBudgets } from "@/utils/LocalStorage";
 
 const categories: Category[] = [
   "medical",
   "entertainment",
+  "travel",
   "food",
   "utility",
   "shopping",
@@ -24,14 +26,7 @@ const categories: Category[] = [
 ];
 
 export default function Budgets() {
-  const [budgets, setBudgets] = useState<Budget[]>([]);
-  useEffect(() => {
-    const storedBudgets = localStorage.getItem("budgets");
-
-    if (storedBudgets) {
-      setBudgets(JSON.parse(storedBudgets));
-    }
-  }, []);
+  const [budgets, setBudgets] = useBudgets();
 
   const [isValid, setIsValid] = useState(true);
   const [added, setBtnUpdated] = useState(false);
@@ -68,7 +63,6 @@ export default function Budgets() {
         newBudget.spent = newBudgets[i].spent;
         newBudgets[i] = newBudget;
         setBudgets(newBudgets);
-        localStorage.setItem("budgets", JSON.stringify(newBudgets));
 
         setBtnUpdated(true);
         setTimeout(() => {
@@ -80,7 +74,6 @@ export default function Budgets() {
 
     newBudgets.push(newBudget);
     setBudgets(newBudgets);
-    localStorage.setItem("budgets", JSON.stringify(newBudgets));
 
     setBtnUpdated(true);
     setTimeout(() => {
@@ -115,16 +108,14 @@ export default function Budgets() {
           </Select>
           <Input
             aria-label="Budget amount"
-            className="!bg-transparent border-none outline-none !text-3xl"
+            className="border-none outline-none !text-3xl"
             radius="none"
             size="lg"
             placeholder="00.00"
             startContent="₹"
             classNames={{
-              input: "hover:!bg-transparent text-3xl",
-              mainWrapper: "bg-transparent hover:!bg-transparent",
-              innerWrapper: "bg-transparent hover:!bg-transparent",
-              inputWrapper: "bg-transparent hover:!bg-transparent",
+              input: "bg-transparent text-3xl",
+              inputWrapper: "!bg-transparent",
             }}
             value={budgetAmount}
             onValueChange={setBudgetAmount}

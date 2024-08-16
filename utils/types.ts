@@ -1,4 +1,4 @@
-export type Category = 'medical' | 'entertainment' | 'food' | 'utility' | 'shopping' | 'loans' | 'gifts' | 'misc';
+export type Category = 'medical' | 'entertainment' | 'travel' | 'food' | 'utility' | 'shopping' | 'loans' | 'gifts' | 'misc';
 export type IncomeCategory = 'salary' | 'business' | 'freelance' | 'gifts' | 'misc';
 
 export type Transaction = {

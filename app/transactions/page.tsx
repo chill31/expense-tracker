@@ -24,24 +24,20 @@ import { Spinner } from "@nextui-org/spinner";
 import { BsTrash3 } from "react-icons/bs";
 import CategoryIcon from "@/components/CategoryIcon";
 import formatNumber from "@/utils/formatNumber";
+import { useTransactions } from "@/utils/LocalStorage";
 
 export default function Transactions() {
   const [isLoading, setIsLoading] = useState(true);
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
-
-  const [originalTransactions, setOriginalTransactions] = useState<
-    Transaction[]
-  >([]);
+  const [transactions, setTransactions] = useTransactions();
+  const [sortedTransactions, setSortedTransactions] = useState<Transaction[]>(transactions);
+ 
+  useEffect(() => {
+    setIsLoading(false);
+  }, []);
 
   useEffect(() => {
-    const storedTransactions = localStorage.getItem("transactions");
-
-    if (storedTransactions) {
-      setTransactions(JSON.parse(storedTransactions));
-      setOriginalTransactions(JSON.parse(storedTransactions));
-      setIsLoading(false);
-    }
-  }, []);
+    setSortedTransactions(transactions);
+  }, [transactions]);
 
   const totalExpenditure = useMemo(() => {
     return transactions.reduce(
@@ -54,8 +50,6 @@ export default function Transactions() {
   function removeTransaction(transactionKey: number) {
     const newTransactions = transactions.filter((_, k) => k !== transactionKey);
     setTransactions(newTransactions);
-    setOriginalTransactions(newTransactions);
-    localStorage.setItem("transactions", JSON.stringify(newTransactions));
 
     const transaction = transactions[transactionKey];
     const storedBudgets = localStorage.getItem("budgets");
@@ -80,7 +74,7 @@ export default function Transactions() {
       direction = "descending";
     }
 
-    const sortedTransactions = [...transactions].sort((a, b) => {
+    const afterSorted = [...sortedTransactions].sort((a, b) => {
       if (column === "type") {
         return direction === "ascending"
           ? a.type === "income"
@@ -111,12 +105,12 @@ export default function Transactions() {
     });
 
     setSortConfig({ column, direction });
-    setTransactions(sortedTransactions);
+    setSortedTransactions(afterSorted);
   }
 
   function resetSort() {
     setSortConfig({});
-    setTransactions(originalTransactions);
+    setSortedTransactions(transactions);
   }
 
   return (
@@ -151,7 +145,8 @@ export default function Transactions() {
 
       <div className="w-full flex flex-col gap-2">
         <Button
-          className="rounded-md self-end"
+          className="self-end"
+          radius='sm'
           size="md"
           color="default"
           onPress={() => resetSort()}
@@ -196,7 +191,7 @@ export default function Transactions() {
             isLoading={isLoading}
             loadingContent={<Spinner color="default" size="lg" />}
           >
-            {transactions.map((item, k) => (
+            {sortedTransactions.map((item, k) => (
               <TableRow key={item.transactionName}>
                 <TableCell>
                   {item.type === "income" ? (
@@ -230,7 +225,8 @@ export default function Transactions() {
                 <TableCell>
                   <Button
                     isIconOnly={true}
-                    className="rounded-md bg-error"
+                    className="bg-error"
+                    radius='sm'
                     tabIndex={0}
                     onPress={() => {
                       removeTransaction(k);
