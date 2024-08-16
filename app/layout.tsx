@@ -7,19 +7,20 @@ import { Providers } from "./providers";
 const dm_sans = DM_Sans({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://expensz.vercel.app'),
+  metadataBase: new URL("https://expensz.vercel.app"),
   title: "Expensz by Chill31",
   description:
     "Expense tracker web app created with the help of Next.js and Tailwind CSS.",
-    openGraph: {
-      title: 'Expensz by Chill31',
-      description: 'Expense tracker web app created with the help of Next.js and Tailwind CSS.',
-      url: 'https://expensz.vercel.app',
-      siteName: 'Expensz',
-      images: '/logo.png',
-      locale: 'en_IN',
-      type: 'website',
-    },
+  openGraph: {
+    title: "Expensz by Chill31",
+    description:
+      "Expense tracker web app created with the help of Next.js and Tailwind CSS.",
+    url: "https://expensz.vercel.app",
+    siteName: "Expensz",
+    images: "/logo.png",
+    locale: "en_IN",
+    type: "website",
+  },
 };
 
 export default function RootLayout({

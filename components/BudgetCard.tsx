@@ -1,6 +1,6 @@
 "use client";
 
-import { Category } from "@/types/types";
+import { Category } from "@/utils/types";
 
 type BudgetCardProps = {
   spent: number;
@@ -30,7 +30,9 @@ export default function BudgetCard({
           classNames={{
             content: "flex items-center justify-center gap-1",
           }}
-          endContent={<span className="absolute top-full left-[50%] translate-x-[-50%] border-l-[5px] border-l-transparent border-r-[5px] border-r-transparent border-t-[10px] border-t-danger-400" />}
+          endContent={
+            <span className="absolute top-full left-[50%] translate-x-[-50%] border-l-[5px] border-l-transparent border-r-[5px] border-r-transparent border-t-[10px] border-t-danger-400" />
+          }
         >
           <BsExclamationTriangle /> Budget Exceeded
         </Chip>
@@ -46,9 +48,7 @@ export default function BudgetCard({
           Hello
         </Chip>
       )}
-      <Card
-        className="bg-dark-secondary/50 w-[250px] h-fit p-4 flex flex-col items-center justify-center gap-2 relative isolate"
-      >
+      <Card className="bg-dark-secondary/50 w-[250px] h-fit p-4 flex flex-col items-center justify-center gap-2 relative isolate">
         <CardHeader className="flex items-center justify-center text-xl text-gray">
           {categoryName}
         </CardHeader>

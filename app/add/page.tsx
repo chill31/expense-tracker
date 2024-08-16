@@ -2,7 +2,7 @@
 
 import Container from "@/components/Container";
 
-import { Transaction, Category, IncomeCategory, Budget } from "@/types/types";
+import { Transaction, Category, IncomeCategory, Budget } from "@/utils/types";
 
 import { useEffect, useState } from "react";
 
@@ -74,7 +74,6 @@ export default function AddTransaction() {
   const previousYear = currentDate.year - 1;
   const janFirstPreviousYear = parseDate(`${previousYear}-01-01`);
 
-  // so that users cant add invalid category to either expense or income, since both have different categories.
   function setTypeAndCategory([type]: any) {
     setTransactionType(type);
     setTransactionCategory(new Set([]));

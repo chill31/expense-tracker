@@ -1,6 +1,6 @@
 "use client";
 
-import { Transaction } from "@/types/types";
+import { Transaction } from "@/utils/types";
 
 import { useEffect, useMemo, useState } from "react";
 
@@ -23,18 +23,9 @@ import { Skeleton } from "@nextui-org/skeleton";
 import { Spinner } from "@nextui-org/spinner";
 import { BsTrash3 } from "react-icons/bs";
 import CategoryIcon from "@/components/CategoryIcon";
+import formatNumber from "@/utils/formatNumber";
 
 export default function Transactions() {
-  function formatNumber(num: number) {
-    if (num >= 10000000) {
-      return Math.floor(num / 1000000) / 10 + " Cr";
-    } else if (num >= 100000) {
-      return Math.floor(num / 10000) / 10 + " L";
-    } else {
-      return num.toLocaleString();
-    }
-  }
-
   const [isLoading, setIsLoading] = useState(true);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
 

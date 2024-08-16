@@ -3,7 +3,7 @@
 import Container from "@/components/Container";
 import { Link } from "@nextui-org/link";
 
-import { Transaction, Budget } from "@/types/types";
+import { Transaction, Budget } from "@/utils/types";
 
 import {
   BarChart,
@@ -23,6 +23,8 @@ import BudgetCard from "@/components/BudgetCard";
 import CategoryIcon from "@/components/CategoryIcon";
 import { useEffect, useMemo, useState } from "react";
 import NextLink from "next/link";
+import formatNumber from "@/utils/formatNumber";
+import RecentTransaction from "@/components/RecentTransaction";
 
 const colors = [
   "#69BCC4", // Teal
@@ -36,17 +38,6 @@ const colors = [
 ];
 
 export default function Home() {
-  
-  function formatNumber(num: number) {
-    if (num >= 10000000) {
-      return Math.floor(num / 1000000) / 10 + " Cr";
-    } else if (num >= 100000) {
-      return Math.floor(num / 10000) / 10 + " L";
-    } else {
-      return num.toLocaleString();
-    }
-  }
-
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [budgets, setBudgets] = useState<Budget[]>([]);
 
@@ -84,12 +75,12 @@ export default function Home() {
       expenses: 0,
       income: 0,
     }));
-    
+
     transactions.forEach((transaction) => {
       const date = new Date(transaction.date);
       const month = date.getMonth();
       const amount = transaction.amount;
-  
+
       if (transaction.type !== "income") {
         monthlyExpenditure[month].expenses += amount;
       } else {
@@ -110,7 +101,7 @@ export default function Home() {
       },
       {} as { [key: string]: number }
     );
-  
+
     const categoryExpensesArray = Object.entries(categoryExpenses).map(
       ([category, amount]) => ({
         category,
@@ -119,8 +110,8 @@ export default function Home() {
     );
 
     const recentTransactions = transactions
-    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-    .slice(0, 3);
+      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+      .slice(0, 3);
 
     return {
       totalExpenditure,
@@ -161,36 +152,17 @@ export default function Home() {
 
             {recentTransactions.map((item, index) => (
               <>
-                <div
+                <RecentTransaction
+                  amount={item.amount}
+                  category={item.category}
+                  transactionName={item.transactionName}
+                  date={item.date}
+                  type={item.type}
                   key={index}
-                  className="flex items-center justify-between w-full"
-                >
-                  <div className="flex gap-4 w-[70%]">
-                    <span className="text-3xl h-12 w-12 bg-gray-300 rounded-full flex items-center justify-center">
-                      <CategoryIcon
-                        category={item.category}
-                        className="text-4xl"
-                      />
-                    </span>
-                    <div className="flex flex-col items-start justify-start gap-1 w-[100%]">
-                      <span className="text-lg max-sm:text-sm overflow-hidden whitespace-nowrap text-ellipsis w-[11ch]">
-                        {item.transactionName}
-                      </span>
-                      <span className="text-white/50 text-sm max-sm:text-[.7rem]">
-                        {new Date(item.date).toDateString()}
-                      </span>
-                    </div>
-                  </div>
-                  <span
-                    className={`${
-                      item.type !== "income" ? "text-error" : "text-success"
-                    } text-xl max-sm:text-base flex items-center justify-end overflow-hidden text-ellipsis whitespace-nowrap min-w-[30%]`}
-                  >
-                    {item.type !== "income" ? "-" : "+"}
-                    {formatNumber(item.amount)} ₹
-                  </span>
-                </div>
-                {(index !== (recentTransactions.length - 1)) && <Divider className="my-4"></Divider>}
+                />
+                {index !== recentTransactions.length - 1 && (
+                  <Divider className="my-4"></Divider>
+                )}
               </>
             ))}
             {transactions.length === 0 && (

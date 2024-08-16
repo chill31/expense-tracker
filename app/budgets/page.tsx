@@ -2,7 +2,7 @@
 
 import CategoryIcon from "@/components/CategoryIcon";
 import Container from "@/components/Container";
-import { Budget, Category } from "@/types/types";
+import { Budget, Category } from "@/utils/types";
 
 import { Select, SelectItem } from "@nextui-org/select";
 import { Input } from "@nextui-org/input";

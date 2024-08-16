@@ -7,7 +7,6 @@ import { useState } from "react";
 import { BsList } from "react-icons/bs";
 
 export default function Sidebar({ currentPath }: { currentPath: string }) {
-
   const [isOpen, setIsOpen] = useState(false);
   function checkAndClose(e: any) {
     if (e.target === e.currentTarget) {
