@@ -1,10 +1,16 @@
 "use client";
 
 import { Image } from "@nextui-org/image";
-import { Link } from "@nextui-org/link";
-import NextLink from "next/link";
 import { useState } from "react";
 import { BsList } from "react-icons/bs";
+import SideBarLink from "./SideBarLink";
+
+const pages = [
+  { href: "/", content: "Dashboard" },
+  { href: "/transactions", content: "View Transactions" },
+  { href: "/add", content: "Add Transactions" },
+  { href: "/budgets", content: "Budgets" },
+];
 
 export default function Sidebar({ currentPath }: { currentPath: string }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -38,46 +44,16 @@ export default function Sidebar({ currentPath }: { currentPath: string }) {
         }`}
       >
         <Image src="/logo.png" width={100} height={100} alt="logo" />
-        <Link
-          href="/"
-          className={`text-xl text-white rounded-e-full px-8 py-3 w-[90%] self-start ${
-            currentPath === "/" ? "bg-white/20" : "bg-white/5"
-          }`}
-          as={NextLink}
-          tabIndex={isOpen ? 0 : -1}
-        >
-          Dashboard
-        </Link>
-        <Link
-          href="/transactions"
-          className={`text-xl text-white rounded-e-full px-8 py-3 w-[90%] self-start ${
-            currentPath === "/transactions" ? "bg-white/20" : "bg-white/5"
-          }`}
-          as={NextLink}
-          tabIndex={isOpen ? 0 : -1}
-        >
-          View Transactions
-        </Link>
-        <Link
-          href="/add"
-          className={`text-xl text-white rounded-e-full px-8 py-3 w-[90%] self-start ${
-            currentPath === "/add" ? "bg-white/20" : "bg-white/5"
-          }`}
-          as={NextLink}
-          tabIndex={isOpen ? 0 : -1}
-        >
-          Add Transactions
-        </Link>
-        <Link
-          href="/budgets"
-          className={`text-xl text-white rounded-e-full px-8 py-3 w-[90%] self-start ${
-            currentPath === "/budgets" ? "bg-white/20" : "bg-white/5"
-          }`}
-          as={NextLink}
-          tabIndex={isOpen ? 0 : -1}
-        >
-          Budgets
-        </Link>
+
+        {pages.map((page, index) => (
+          <SideBarLink
+            key={index}
+            href={page.href}
+            content={page.content}
+            currentPath={currentPath}
+            tabIndex={isOpen ? 0 : -1}
+          />
+        ))}
       </div>
     </>
   );
