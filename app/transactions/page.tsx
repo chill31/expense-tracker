@@ -29,8 +29,9 @@ import { useTransactions } from "@/utils/LocalStorage";
 export default function Transactions() {
   const [isLoading, setIsLoading] = useState(true);
   const [transactions, setTransactions] = useTransactions();
-  const [sortedTransactions, setSortedTransactions] = useState<Transaction[]>(transactions);
- 
+  const [sortedTransactions, setSortedTransactions] =
+    useState<Transaction[]>(transactions);
+
   useEffect(() => {
     setIsLoading(false);
   }, []);
@@ -47,20 +48,31 @@ export default function Transactions() {
     );
   }, [transactions]);
 
-  function removeTransaction(transactionKey: number) {
+  function removeTransaction(transactionIndexInSorted: number) {
+    const transactionToRemove = sortedTransactions[transactionIndexInSorted];
+    const transactionKey = transactions.findIndex(
+      (transaction) => transaction === transactionToRemove
+    );
+
+    if (transactionKey === -1) return;
+
     const newTransactions = transactions.filter((_, k) => k !== transactionKey);
     setTransactions(newTransactions);
 
-    const transaction = transactions[transactionKey];
     const storedBudgets = localStorage.getItem("budgets");
     if (!storedBudgets) return;
+
     const budgets = JSON.parse(storedBudgets);
-    if (transaction.type === "income") return;
+    if (transactionToRemove.type === "income") return;
+
     const categoryBudget = budgets.find(
-      (budget: { category: string }) => budget.category === transaction.category
+      (budget: { category: string }) =>
+        budget.category === transactionToRemove.category
     );
+
     if (!categoryBudget || categoryBudget.budget === 0) return;
-    categoryBudget.spent -= transaction.amount;
+
+    categoryBudget.spent -= transactionToRemove.amount;
     localStorage.setItem("budgets", JSON.stringify(budgets));
   }
 
@@ -146,7 +158,7 @@ export default function Transactions() {
       <div className="w-full flex flex-col gap-2">
         <Button
           className="self-end"
-          radius='sm'
+          radius="sm"
           size="md"
           color="default"
           onPress={() => resetSort()}
@@ -226,7 +238,7 @@ export default function Transactions() {
                   <Button
                     isIconOnly={true}
                     className="bg-error"
-                    radius='sm'
+                    radius="sm"
                     tabIndex={0}
                     onPress={() => {
                       removeTransaction(k);
