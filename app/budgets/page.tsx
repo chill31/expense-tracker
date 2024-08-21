@@ -1,17 +1,19 @@
 "use client";
 
-import CategoryIcon from "@/components/CategoryIcon";
+import { useState } from "react";
+
 import Container from "@/components/Container";
+import BudgetCard from "@/components/BudgetCard";
+import CategoryIcon from "@/components/CategoryIcon";
 import { Category } from "@/utils/types";
+import { useBudgets } from "@/utils/LocalStorage";
 
 import { Select, SelectItem } from "@nextui-org/select";
 import { Input } from "@nextui-org/input";
 import { Button } from "@nextui-org/button";
-import { useState } from "react";
-import BudgetCard from "@/components/BudgetCard";
-import { Popover, PopoverContent, PopoverTrigger } from "@nextui-org/react";
+import { Popover, PopoverContent, PopoverTrigger } from "@nextui-org/popover";
+
 import { BsCheckLg } from "react-icons/bs";
-import { useBudgets } from "@/utils/LocalStorage";
 
 const categories: Category[] = [
   "medical",

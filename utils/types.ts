@@ -7,6 +7,7 @@ export type Transaction = {
   amount: number;
   date: Date;
   type: 'expense' | 'income';
+  id: string;
 }
 
 export type Budget = {

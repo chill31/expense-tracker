@@ -1,12 +1,15 @@
 "use client";
 
-import { Transaction } from "@/utils/types";
-
 import { useEffect, useMemo, useState } from "react";
 
 import NextLink from "next/link";
 
+import { Transaction } from "@/utils/types";
+import formatNumber from "@/utils/formatNumber";
+import { useTransactions } from "@/utils/LocalStorage";
 import Container from "@/components/Container";
+import CategoryIcon from "@/components/CategoryIcon";
+
 import { Button } from "@nextui-org/button";
 import {
   Table,
@@ -16,15 +19,13 @@ import {
   TableRow,
   TableCell,
 } from "@nextui-org/table";
-
 import { Link } from "@nextui-org/link";
 import { SortDescriptor } from "@nextui-org/react";
 import { Skeleton } from "@nextui-org/skeleton";
 import { Spinner } from "@nextui-org/spinner";
+
 import { BsTrash3 } from "react-icons/bs";
-import CategoryIcon from "@/components/CategoryIcon";
-import formatNumber from "@/utils/formatNumber";
-import { useTransactions } from "@/utils/LocalStorage";
+
 
 export default function Transactions() {
   const [isLoading, setIsLoading] = useState(true);
@@ -48,15 +49,16 @@ export default function Transactions() {
     );
   }, [transactions]);
 
-  function removeTransaction(transactionIndexInSorted: number) {
-    const transactionToRemove = sortedTransactions[transactionIndexInSorted];
-    const transactionKey = transactions.findIndex(
-      (transaction) => transaction === transactionToRemove
+  function removeTransaction(transactionId: string) {
+    const transactionToRemove = sortedTransactions.find(
+      (transaction) => transaction.id === transactionId
     );
 
-    if (transactionKey === -1) return;
+    if (!transactionToRemove) return;
 
-    const newTransactions = transactions.filter((_, k) => k !== transactionKey);
+    const newTransactions = transactions.filter(
+      (transaction) => transaction.id !== transactionId
+    );
     setTransactions(newTransactions);
 
     const storedBudgets = localStorage.getItem("budgets");
@@ -170,7 +172,6 @@ export default function Transactions() {
           onSortChange={sortTable}
           sortDescriptor={sortConfig as SortDescriptor}
           isStriped={true}
-          classNames={{}}
         >
           <TableHeader>
             <TableColumn key="type" allowsSorting className="w-[10ch]">
@@ -203,8 +204,8 @@ export default function Transactions() {
             isLoading={isLoading}
             loadingContent={<Spinner color="default" size="lg" />}
           >
-            {sortedTransactions.map((item, k) => (
-              <TableRow key={item.transactionName}>
+            {sortedTransactions.map((item) => (
+              <TableRow key={item.id} className="cursor-pointer">
                 <TableCell>
                   {item.type === "income" ? (
                     <span className="bg-success h-7 aspect-square rounded-full flex items-center justify-center text-3xl">
@@ -241,7 +242,7 @@ export default function Transactions() {
                     radius="sm"
                     tabIndex={0}
                     onPress={() => {
-                      removeTransaction(k);
+                      removeTransaction(item.id);
                     }}
                   >
                     <BsTrash3 />

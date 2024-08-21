@@ -1,6 +1,15 @@
 "use client";
 
+import { useMemo } from "react";
+import NextLink from "next/link";
+
 import Container from "@/components/Container";
+import BudgetCard from "@/components/BudgetCard";
+import formatNumber from "@/utils/formatNumber";
+import RecentTransaction from "@/components/RecentTransaction";
+import { useBudgets, useTransactions } from "@/utils/LocalStorage";
+
+import { Divider } from "@nextui-org/divider";
 import { Link } from "@nextui-org/link";
 
 import {
@@ -15,15 +24,6 @@ import {
   Legend,
 } from "recharts";
 
-import { Divider } from "@nextui-org/divider";
-
-import BudgetCard from "@/components/BudgetCard";
-import { useMemo } from "react";
-import NextLink from "next/link";
-import formatNumber from "@/utils/formatNumber";
-import RecentTransaction from "@/components/RecentTransaction";
-
-import { useBudgets, useTransactions } from "@/utils/LocalStorage";
 
 const colors = [
   "#69BCC4", // Teal
@@ -145,7 +145,8 @@ export default function Home() {
                   transactionName={item.transactionName}
                   date={item.date}
                   type={item.type}
-                  key={index}
+                  id={item.id}
+                  key={item.id}
                 />
                 {index !== recentTransactions.length - 1 && (
                   <Divider className="my-4"></Divider>
@@ -174,7 +175,7 @@ export default function Home() {
               nameKey="category"
               startAngle={0}
             >
-              {onlyExpensesTransactions.map((entry, index) => (
+              {onlyExpensesTransactions.map((_, index) => (
                 <Cell key={index} fill={colors[index]} />
               ))}
             </Pie>
@@ -210,9 +211,9 @@ export default function Home() {
         >
           {budgets
             .filter((item) => item.budget !== 0)
-            .map((item, index) => (
+            .map((item) => (
               <BudgetCard
-                key={index}
+                key={item.category}
                 categoryName={item.category}
                 spent={item.spent}
                 total={item.budget}

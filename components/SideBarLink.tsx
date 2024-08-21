@@ -1,5 +1,5 @@
-import { Link } from "@nextui-org/react";
 import NextLink from 'next/link'
+import { Link } from "@nextui-org/react";
 
 export default function SideBarLink({ href, content, currentPath, tabIndex }: { href: string; content: string; currentPath: string; tabIndex: 0|-1 }) {
   return (

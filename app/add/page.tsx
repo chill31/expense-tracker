@@ -1,17 +1,17 @@
 "use client";
 
-import Container from "@/components/Container";
-
-import { Transaction, Category, IncomeCategory, Budget } from "@/utils/types";
-
 import { useState } from "react";
+
+import Container from "@/components/Container";
+import CategoryIcon from "@/components/CategoryIcon";
+import { Transaction, Category, IncomeCategory, Budget } from "@/utils/types";
+import { useTransactions } from "@/utils/LocalStorage";
 
 import { Input } from "@nextui-org/input";
 import { Select, SelectItem } from "@nextui-org/select";
 import { DatePicker } from "@nextui-org/date-picker";
 import { Button } from "@nextui-org/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@nextui-org/popover";
-
 import { Card, CardBody, CardFooter } from "@nextui-org/card";
 
 import {
@@ -22,9 +22,8 @@ import {
   parseDate,
 } from "@internationalized/date";
 import { I18nProvider } from "@react-aria/i18n";
-import CategoryIcon from "@/components/CategoryIcon";
+
 import { BsCheckLg, BsDash, BsPlus } from "react-icons/bs";
-import { useTransactions } from "@/utils/LocalStorage";
 
 const categories: Category[] = [
   "medical",
@@ -96,6 +95,7 @@ export default function AddTransaction() {
       category: transactionCategory.values().next().value,
       date: new Date(date.toString()),
       type: transactionType.values().next().value,
+      id: crypto.randomUUID(),
     };
     const newTransactions = [newTransaction, ...transactions];
     setTransactions(newTransactions);

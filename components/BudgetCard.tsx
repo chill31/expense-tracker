@@ -1,18 +1,19 @@
 "use client";
 
 import { Category } from "@/utils/types";
+import formatNumber from "@/utils/formatNumber";
+
+import { Card, CardFooter, CardHeader } from "@nextui-org/card";
+import { CircularProgress } from "@nextui-org/progress";
+import { Chip } from "@nextui-org/chip";
+
+import { BsExclamationTriangle } from "react-icons/bs";
 
 type BudgetCardProps = {
   spent: number;
   total: number;
   categoryName: Category;
 };
-
-import { Card, CardFooter, CardHeader } from "@nextui-org/card";
-import { CircularProgress } from "@nextui-org/progress";
-import { Chip } from "@nextui-org/chip";
-import { BsExclamationTriangle } from "react-icons/bs";
-import formatNumber from "@/utils/formatNumber";
 
 export default function BudgetCard({
   spent,

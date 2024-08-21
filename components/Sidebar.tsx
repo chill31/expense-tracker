@@ -4,6 +4,7 @@ import { Image } from "@nextui-org/image";
 import { useState } from "react";
 import { BsList } from "react-icons/bs";
 import SideBarLink from "./SideBarLink";
+import { usePathname } from "next/navigation";
 
 const pages = [
   { href: "/", content: "Dashboard" },
@@ -12,7 +13,10 @@ const pages = [
   { href: "/budgets", content: "Budgets" },
 ];
 
-export default function Sidebar({ currentPath }: { currentPath: string }) {
+export default function Sidebar() {
+
+  const currentPath = usePathname();
+
   const [isOpen, setIsOpen] = useState(false);
   function checkAndClose(e: any) {
     if (e.target === e.currentTarget) {

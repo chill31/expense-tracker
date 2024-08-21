@@ -1,5 +1,5 @@
-import { usePathname } from "next/navigation";
 import Sidebar from "./Sidebar";
+import { twMerge } from "tailwind-merge";
 
 export default function Container({
   children,
@@ -9,13 +9,11 @@ export default function Container({
   className?: string;
 }) {
 
-  const path = usePathname();
-
   return (
     <div
-      className={`w-screen min-h-screen overflow-x-hidden bg-dark flex flex-col gap-24 items-center p-20 max-[900px]:pt-20 max-[900px]:p-10 ${className}`}
+      className={twMerge("w-screen min-h-screen overflow-x-hidden bg-dark flex flex-col gap-24 items-center p-20 max-[900px]:pt-20 max-[900px]:p-10", className)}
     >
-      <Sidebar currentPath={path} />
+      <Sidebar />
       {children}
     </div>
   );
